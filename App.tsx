@@ -1,13 +1,21 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity, Animated} from 'react-native';
+import {View, TouchableOpacity, Animated, Text} from 'react-native';
 
 export default function App() {
-  const value = useState(new Animated.Value(0))[0];
+  const opacity = useState(new Animated.Value(0))[0];
 
-  function moveBall() {
-    Animated.timing(value, {
+  function fadeInBall() {
+    Animated.timing(opacity, {
       toValue: 1,
-      duration: 4000,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }
+
+  function fadeOutBall() {
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 1000,
       useNativeDriver: true,
     }).start();
   }
@@ -15,17 +23,21 @@ export default function App() {
   return (
     <View style={{flex: 1}}>
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <TouchableOpacity onPress={moveBall}>
-          <Animated.View
-            style={[
-              {
-                backgroundColor: 'red',
-                width: 100,
-                height: 100,
-                borderRadius: 50,
-                opacity: value,
-              },
-            ]}></Animated.View>
+        <Animated.View
+          style={[
+            {
+              backgroundColor: 'red',
+              width: 100,
+              height: 100,
+              borderRadius: 50,
+              opacity: opacity,
+            },
+          ]}></Animated.View>
+        <TouchableOpacity onPress={fadeInBall}>
+          <Text>Fade In</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={fadeOutBall}>
+          <Text>Fade Out</Text>
         </TouchableOpacity>
       </View>
     </View>
