@@ -1,54 +1,44 @@
 import React, {useState} from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Animated,
-  Text,
-  PanResponder,
-} from 'react-native';
+import {View, TouchableOpacity, Animated, Text} from 'react-native';
 
 export default function App() {
-  const pan = useState(new Animated.ValueXY())[0];
+  const value = new Animated.ValueXY({x: 0, y: 0});
 
-  const panResponder = useState(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        pan.setOffset({
-          x: pan.x._value,
-          y: pan.y._value,
-        });
-      },
-      onPanResponderMove: (_, gesture) => {
-        pan.x.setValue(gesture.dx);
-        pan.y.setValue(gesture.dy);
-      },
-      onPanResponderRelease: () => {
-        pan.flattenOffset();
-      },
-    }),
-  )[0];
+  function moveSquare() {
+    Animated.timing(value, {
+      toValue: {x: 300, y: 500},
+      duration: 4000,
+      useNativeDriver: false,
+    }).start();
+  }
+
+  const color = value.y.interpolate({
+    inputRange: [0, 100, 200, 300, 400, 500],
+    outputRange: ['red', 'blue', 'green', 'green', 'blue', 'red'],
+  });
+
+  const rotate = value.x.interpolate({
+    inputRange: [0, 200],
+    outputRange: ['0deg', '360deg'],
+  });
 
   return (
     <View style={{flex: 1}}>
-      <Animated.View
-        style={[
-          {
-            backgroundColor: 'red',
-            width: 100,
-            height: 100,
-            borderRadius: 50,
-            transform: [
-              {
-                translateX: pan.x,
-              },
-              {
-                translateY: pan.y,
-              },
-            ],
-          },
-        ]}
-        {...panResponder.panHandlers}></Animated.View>
+      <TouchableOpacity onPress={moveSquare}>
+        <Animated.View
+          style={[
+            {
+              backgroundColor: color,
+              width: 100,
+              height: 100,
+              transform: [
+                {translateX: value.x},
+                {translateY: value.y},
+                {rotate: rotate},
+              ],
+            },
+          ]}></Animated.View>
+      </TouchableOpacity>
     </View>
   );
 }
