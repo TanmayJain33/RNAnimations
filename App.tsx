@@ -1,45 +1,50 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity, Animated, Text} from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  Animated,
+  Text,
+  PanResponder,
+} from 'react-native';
 
 export default function App() {
-  const opacity = useState(new Animated.Value(0))[0];
+  const pan = useState(new Animated.ValueXY())[0];
 
-  function fadeInBall() {
-    Animated.timing(opacity, {
-      toValue: 1,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }
-
-  function fadeOutBall() {
-    Animated.timing(opacity, {
-      toValue: 0,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }
+  const panResponder = useState(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        pan.setOffset({
+          x: pan.x._value,
+          y: pan.y._value,
+        });
+      },
+      onPanResponderMove: Animated.event([
+        null,
+        {
+          dx: pan.x,
+          dy: pan.y,
+        },
+      ]),
+      onPanResponderRelease: () => {
+        pan.flattenOffset();
+      },
+    }),
+  )[0];
 
   return (
     <View style={{flex: 1}}>
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Animated.View
-          style={[
-            {
-              backgroundColor: 'red',
-              width: 100,
-              height: 100,
-              borderRadius: 50,
-              opacity: opacity,
-            },
-          ]}></Animated.View>
-        <TouchableOpacity onPress={fadeInBall}>
-          <Text>Fade In</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={fadeOutBall}>
-          <Text>Fade Out</Text>
-        </TouchableOpacity>
-      </View>
+      <Animated.View
+        style={[
+          {
+            backgroundColor: 'red',
+            width: 100,
+            height: 100,
+            borderRadius: 50,
+          },
+          pan.getLayout(),
+        ]}
+        {...panResponder.panHandlers}></Animated.View>
     </View>
   );
 }
